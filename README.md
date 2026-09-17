@@ -31,10 +31,10 @@ This repo currently includes skills focused on Azure DevOps work item and iterat
 - `boards-team-active-work` – Gets active work items for a team showing dependencies, priorities, and sprint assignments with parent/child hierarchy
 - `boards-work-item-summary` – Summarizes a single work item (plus links and comments)
 - `pipelines-build-summary` – Lists, inspects, and troubleshoots pipeline builds; shows recent builds, drills into status/results, displays logs for failed steps, and lists associated changes
-- `pipelines-pr-validation` – Finds a pull request's validation build and diagnoses PRs that get no build (merge ref, listing lag, conflicts, branch policies)
-- `pipelines-run-and-validate` – Queues runs on an explicit ref, passes template parameters, cancels runs, and validates YAML with `previewRun`
-- `pipelines-yaml-authoring` – Avoids silent traps when writing pipeline YAML: shells, macros, secrets, template parameters, conditions, `Cache@2`, test publishing
-- `repos-pull-requests` – Updates pull requests safely: retargeting, labels, merge commit message, auto-complete, vote history, stacked PRs, protected-branch pushes
+- `pipelines-pr-validation` – Finds a pull request's validation build and diagnoses PRs that get no build
+- `pipelines-run-and-validate` – Queues runs on a ref with parameters, cancels them, and expands YAML with `previewRun`
+- `pipelines-yaml-authoring` – Silent traps in pipeline YAML
+- `repos-pull-requests` – Pull request updates that silently change nothing, auto-complete, votes, protected-branch pushes
 - `security-alert-review` – Lists and reviews Advanced Security alerts (dependency vulnerabilities, secret exposure, code scanning findings) with filtering by severity, state, and alert type
 - `work-iterations` – Lists, creates, and assigns iterations for projects and teams
 
@@ -60,19 +60,17 @@ At a high level:
 
 ## 🤖 Using These Skills in Claude Code
 
-This repository is also a [Claude Code plugin marketplace](https://code.claude.com/docs/en/plugin-marketplaces). The `azure-devops` plugin loads every skill under `.github/skills/`.
+This repository is a [Claude Code plugin marketplace](https://code.claude.com/docs/en/plugin-marketplaces); its `azure-devops` plugin loads every skill under `.github/skills/`.
 
-1. Ensure you have the Azure DevOps MCP server configured and authenticated (see above).
-2. Add the marketplace and install the plugin:
+1. Configure the Azure DevOps MCP server (see above).
+2. Install the plugin:
 
    ```bash
    claude plugin marketplace add SchulteDev/azure-devops-skills
    claude plugin install azure-devops@azure-devops-skills
    ```
 
-3. Start Claude Code; skills trigger from their `description`, like in VS Code.
-
-To enable the plugin for everyone working in a repository, add it to that repository's `.claude/settings.json`:
+To enable it for everyone in a repository, add to its `.claude/settings.json`:
 
 ```json
 {

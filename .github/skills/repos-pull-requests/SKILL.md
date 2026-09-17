@@ -1,70 +1,56 @@
 ---
 name: repos-pull-requests
-description: Create, update, retarget, label, auto-complete, and read Azure DevOps pull requests without the silent failures of the PR tools. Use for any change to a PR's title, description, target branch, labels, merge commit message, auto-complete, or comment threads, for reading PR vote history, and before pushing directly to a policy-protected branch.
+description: Update, retarget, label, and auto-complete Azure DevOps pull requests, read vote history, and push to policy-protected branches. Several PR writes report success but change nothing.
 ---
 
 # Pull requests
 
-Several PR write operations **report success while changing nothing**. The rule for every write in this skill: **read the PR back** with `repo_pull_request` (action `get`) and compare the fields you meant to change. The update response is not proof — it can mix new and stale values.
+After every write, read the PR back with `repo_pull_request` (action `get`) and compare. The update response can mix new and stale values.
 
 # Tools
 
-Use Azure DevOps MCP Server tools for all interactions with Azure DevOps.
-
-- `repo_pull_request` (action: `get`, `list`): Read a PR (`includeLabels`, `includeWorkItemRefs`) or list PRs.
-- `repo_pull_request_write` (action: `create`, `update`, `update_reviewers`, `vote`): Change a PR.
-- `repo_pull_request_thread` (action: `list`, `list_comments`): Read comment threads.
-- `repo_pull_request_thread_write` (action: `create`, `reply`, `update`, `update_status`): Write comment threads.
-
-Prefer these tools over the `az repos pr` CLI for PR **text**: `az repos pr show` corrupts non-ASCII characters in descriptions (for example, em-dashes come back as U+FFFD), so never write a description read through `az` back to the PR; and `az repos pr update --merge-commit-message` silently truncates the message at its first newline.
+- `repo_pull_request` (actions `get` with `includeLabels`, `list`)
+- `repo_pull_request_write` (actions `create`, `update`, `update_reviewers`, `vote`)
+- `repo_pull_request_thread` / `repo_pull_request_thread_write`
 
 # Rules
 
-## 1. Title and description
+## 1. Updates
 
-- The description is limited to **4000 characters**. Longer values reject the whole call — nothing is truncated. Keep the description to what a reviewer needs on screen and put long rationale in commit messages.
-- **Never combine `targetRefName` with `title` or `description` in one `update` call.** The retarget is applied, the text changes are dropped, and the response echoes the old text. Retarget in one call, then change title/description in a second call, then read back.
-- **Changing `title` or `description` of a draft PR publishes it** unless you also pass `isDraft: true`.
-- Retargeting has no CLI path (`az repos pr update` has no target option and `az devops invoke` rejects `PATCH` on pull requests), so use `repo_pull_request_write`.
+- Every `update` publishes a draft PR unless you pass `isDraft: true` — labels, auto-complete, and text changes alike.
+- An `update` with `targetRefName` applies only the retarget; title, description, and other fields are silently dropped. Retarget alone, then update the rest.
+- Retargeting has no CLI path; use `repo_pull_request_write`.
+- Description max 4000 characters; longer rejects the whole call.
+- `az repos pr show` corrupts non-ASCII text; never write a description read through `az` back to the PR.
 
 ## 2. Labels
 
-- `labels` on `update` **replaces the whole label set**. To add or remove one label, read the current labels with `repo_pull_request` (action `get`, `includeLabels: true`), modify that list, and pass the complete result — an empty array removes all labels.
+- `labels` replaces the whole set: read the current labels, edit the list, pass all of them. `[]` removes all.
 
 ## 3. Merge commit message and auto-complete
 
-- The squash/merge commit message (`completionOptions.mergeCommitMessage`) is stored **separately** from the description. Rewriting the description does not update it, and it is what lands on the target branch. When a PR's scope changes, update the merge message too, and keep its first line in sync with the title (it becomes the commit subject).
-- `mergeCommitMessage` is only stored together with `autoComplete: true`. Alone or with `autoComplete: false`, the call succeeds and stores nothing.
-- Arming replaces all completion options: pass `mergeStrategy` and `deleteSourceBranch` every time, or they reset (`noFastForward`, not deleted).
-- `autoComplete: false` does **not** cancel auto-complete. Cancel with `az repos pr update --id <prId> --auto-complete false`.
-- Completion options are capped at **4000 encoded characters** (merge message included).
-- Armed means `autoCompleteSetBy` is not null. `completionOptions.triggeredByAutoComplete` is not a reliable signal.
-- A PR that must not merge yet cannot get a new merge message through the tool; edit it in the **Complete pull request** dialog.
-- Title/description updates on an armed PR keep the completion options.
+- `mergeCommitMessage` is stored separately from the description and is what lands on the target branch. Update it when the PR's scope changes; keep its first line equal to the title.
+- `mergeCommitMessage` is only stored with `autoComplete: true`; otherwise it is silently ignored.
+- Arming replaces all completion options: pass `mergeStrategy`, `deleteSourceBranch`, and `transitionWorkItems` every time, or they reset (`noFastForward`, not deleted, transition).
+- `autoComplete: false` does not cancel auto-complete. Use `az repos pr update --id <prId> --auto-complete false`.
+- `az repos pr update --merge-commit-message` truncates at the first newline.
+- Completion options are capped at 4000 encoded characters.
+- Armed means `autoCompleteSetBy` is not null.
+- To change the merge message without arming, use the web **Complete pull request** dialog.
 
-## 4. Votes and approvals
+## 4. Votes
 
-- The reviewers list shows only the **current** vote. Vote history lives in the PR's threads as system comments such as `"<name> voted 10"` (10 approve, 5 approve with suggestions, -5 waiting for author, -10 reject) and `"Vote of <name> was reset: Changes pushed to source branch"`. Read threads to answer "was this ever approved?".
-- When the target branch's reviewer policy has **reset votes on push** enabled, any push to the source branch wipes existing approvals. If a PR is approved and only its build is expired, **re-queue the policy build instead of pushing** (see the `pipelines-pr-validation` skill).
-- Do not vote, approve, or complete a PR unless the user explicitly asks. With "allow requestors to approve their own changes" enabled and auto-complete armed, the author's own approval can merge the PR immediately.
+- Never vote, approve, or complete unless asked.
+- The reviewers list shows current votes only. History is in thread system comments: `<name> voted 10` (10 approve, 5 with suggestions, -5 waiting, -10 reject) and `Vote of <name> was reset`.
+- A push can reset approvals. For an approved PR with an expired build, re-queue the policy build instead of pushing.
 
-## 5. Stacked pull requests
+## 5. Stacked PRs with squash merges
 
-When PRs are stacked (a PR targets another PR's source branch) and complete as **squash** merges:
+- After the parent completes, retarget the child and merge the base branch into the child's source branch; otherwise the child re-shows the parent's changes.
+- Merge the base up the stack; don't rebase (resets votes and comment anchors).
 
-- After the lower PR completes, retarget the child to the base branch **and merge the base branch into the child's source branch**. Retargeting alone leaves a stale merge base and the child re-shows the parent's changes as new.
-- Prefer merging the base branch up the stack over rebasing: a rebase force-pushes every branch above it, discards comment anchoring, and resets votes.
-- A stacked PR usually gets no validation build (see the `pipelines-pr-validation` skill).
+## 6. Direct push to a protected branch
 
-## 6. Pushing directly to a protected branch
-
-- Any **enabled** branch policy makes a direct push fail with `TF402455` ("you must use a pull request to update this branch"). Force-pushing does not help, and `git push --atomic` is not supported by Azure Repos.
-- Prefer the per-user **Bypass policies when pushing** permission over disabling policies. Disabling a blocking policy releases every PR with auto-complete armed against that branch — list armed PRs (`autoCompleteSetBy` not null) and cancel their auto-complete first.
-- Push the branch first, then tags, so a rejected push never leaves a tag on a commit that is not on the branch.
-
-# Examples
-
-- "Retarget PR 123 to main and update its description"
-- "Remove the needs-review label from PR 456"
-- "Set auto-complete with squash on PR 789 and fix the merge message"
-- "Was PR 321 ever approved?"
+- Any enabled branch policy rejects a direct push (`TF402455`). `git push --atomic` is unsupported.
+- Use the per-user **Bypass policies when pushing** permission. Disabling policies releases every PR with auto-complete armed.
+- Push the branch before tags.
