@@ -79,6 +79,14 @@ Use Azure DevOps MCP Server tools for all interactions with Azure DevOps.
 - "what changes were in build 12345?"
 - "list commits for build 12345 in project Contoso"
 
+## 5. Large responses and known tool limitations
+
+- **Listing builds can be expensive.** On the local MCP server, every build returned by `pipelines_build` (action `list`) carries the full `_links`, project, and definition objects (several thousand characters per build), and the tool has no field selection. Keep `top` small. When you need many builds, or only a few fields, use the Azure CLI instead: `az pipelines runs list --pipeline-ids <id> --top 20 --query "[].{id:id,status:status,result:result,branch:sourceBranch,queued:queueTime}" -o json`, with `--branch`, `--status`, and `--result` filters.
+- `pipelines_run` (action `list`) returns up to 10,000 runs without paging. Prefer `pipelines_build` (action `list`) with filters.
+- **Step durations:** use the timestamps on the `Starting:` and `Finishing:` lines inside a step's log (`pipelines_build_log` action `get_content`, narrowed with `startLine`/`endLine`). The `createdOn`/`lastChangedOn` values from `pipelines_build_log` (action `list`) describe when the log was written, not how long the step ran.
+- **Artifact downloads:** on the local MCP server, `pipelines_artifact` (action `download`) can report success while writing a 0-byte file, and a relative `destinationPath` resolves against the MCP server's working directory. Check the file size, and fall back to `az pipelines runs artifact download --run-id <buildId> --artifact-name <name> --path <dir>`.
+- An empty build list right after a push does not mean no build was queued, and PR builds are listed under `refs/pull/<prId>/merge`. See the `pipelines-pr-validation` skill.
+
 # Display results
 
 When displaying build lists, show the following in a table:
