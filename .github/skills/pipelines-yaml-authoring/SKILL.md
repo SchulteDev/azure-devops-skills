@@ -1,6 +1,6 @@
 ---
 name: pipelines-yaml-authoring
-description: Write or review Azure Pipelines YAML, and debug pipelines that behave differently than their YAML suggests (shells, macros, secrets, templates, parameters, Cache@2, test publishing).
+description: Use when writing, reviewing, or debugging Azure Pipelines YAML: steps that differ on Windows agents, empty variables or secrets, template parameters, conditions, Cache@2 misses, inflated or missing test results.
 ---
 
 # Azure Pipelines YAML

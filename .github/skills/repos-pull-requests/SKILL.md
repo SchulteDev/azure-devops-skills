@@ -1,6 +1,6 @@
 ---
 name: repos-pull-requests
-description: Update, retarget, label, and auto-complete Azure DevOps pull requests, read vote history, and push to policy-protected branches. Several PR writes report success but change nothing.
+description: Use when changing an Azure DevOps pull request (retarget, title, description, labels, draft, merge commit message, auto-complete, votes), when a PR update seems ignored, or before pushing to a policy-protected branch (TF402455).
 ---
 
 # Pull requests

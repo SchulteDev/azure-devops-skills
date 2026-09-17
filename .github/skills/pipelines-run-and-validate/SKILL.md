@@ -1,6 +1,6 @@
 ---
 name: pipelines-run-and-validate
-description: Queue Azure DevOps pipeline runs on a branch or ref with template parameters, cancel or retry them, and expand pipeline YAML without running it (previewRun).
+description: Use when queuing an Azure DevOps pipeline run on a branch or PR, passing template parameters, cancelling or retrying a run, or checking pipeline YAML changes without running them (previewRun, Unexpected parameter).
 ---
 
 # Run pipelines and validate YAML

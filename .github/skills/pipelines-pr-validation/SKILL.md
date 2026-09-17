@@ -1,6 +1,6 @@
 ---
 name: pipelines-pr-validation
-description: Find an Azure DevOps pull request's validation build, diagnose why a PR got no build, and check which branch policies gate a branch.
+description: Use when an Azure DevOps pull request seems to have no validation build, a build listing is empty after a push, CI looks broken, or you need to know which branch policies gate a branch.
 ---
 
 # Pull request validation builds
