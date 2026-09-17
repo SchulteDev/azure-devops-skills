@@ -32,7 +32,7 @@ This repo currently includes skills focused on Azure DevOps work item and iterat
 - `boards-work-item-summary` – Summarizes a single work item (plus links and comments)
 - `pipelines-build-summary` – Lists, inspects, and troubleshoots pipeline builds; shows recent builds, drills into status/results, displays logs for failed steps, and lists associated changes
 - `pipelines-pr-validation` – Finds a pull request's validation build and diagnoses PRs that get no build
-- `pipelines-run-and-validate` – Queues runs on a ref with parameters, cancels them, and expands YAML with `previewRun`
+- `pipelines-run-and-validate` – Queues runs on a ref with parameters, waits for or cancels them, and expands YAML with `previewRun`
 - `pipelines-yaml-authoring` – Silent traps in pipeline YAML
 - `repos-pull-requests` – Pull request updates that silently change nothing, auto-complete, votes, protected-branch pushes
 - `security-alert-review` – Lists and reviews Advanced Security alerts (dependency vulnerabilities, secret exposure, code scanning findings) with filtering by severity, state, and alert type
