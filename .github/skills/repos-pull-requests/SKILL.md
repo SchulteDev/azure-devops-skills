@@ -24,6 +24,7 @@ Prefer these tools over the `az repos pr` CLI for PR **text**: `az repos pr show
 
 - The description is limited to **4000 characters**. Longer values reject the whole call — nothing is truncated. Keep the description to what a reviewer needs on screen and put long rationale in commit messages.
 - **Never combine `targetRefName` with `title` or `description` in one `update` call.** The retarget is applied, the text changes are dropped, and the response echoes the old text. Retarget in one call, then change title/description in a second call, then read back.
+- **Changing `title` or `description` of a draft PR publishes it** unless you also pass `isDraft: true`.
 - Retargeting has no CLI path (`az repos pr update` has no target option and `az devops invoke` rejects `PATCH` on pull requests), so use `repo_pull_request_write`.
 
 ## 2. Labels
@@ -33,13 +34,13 @@ Prefer these tools over the `az repos pr` CLI for PR **text**: `az repos pr show
 ## 3. Merge commit message and auto-complete
 
 - The squash/merge commit message (`completionOptions.mergeCommitMessage`) is stored **separately** from the description. Rewriting the description does not update it, and it is what lands on the target branch. When a PR's scope changes, update the merge message too, and keep its first line in sync with the title (it becomes the commit subject).
-- `mergeCommitMessage` is only persisted as part of the auto-complete bundle:
-  - `mergeCommitMessage` alone is rejected ("At least one field … must be provided").
-  - With `autoComplete: false` the call succeeds and **persists nothing**.
-  - With `autoComplete: true` it is stored — but `mergeStrategy`, `deleteSourceBranch` (default `false`) and `transitionWorkItems` (default `true`) fall back to their defaults unless passed. Always re-send the PR's intended values, or a squash PR is silently downgraded.
-- The whole completion options payload is capped at **4000 encoded characters** (merge message title and body together).
-- After arming, read the PR back: `autoCompleteSetBy` **not null** is the only reliable "armed" signal. `completionOptions.triggeredByAutoComplete` can be `true` on a PR that is not armed.
-- If you cannot arm auto-complete (for example, the PR must not merge yet), there is no tool path to fix a stale merge message — tell the user to edit it in the **Complete pull request** dialog.
+- `mergeCommitMessage` is only stored together with `autoComplete: true`. Alone or with `autoComplete: false`, the call succeeds and stores nothing.
+- Arming replaces all completion options: pass `mergeStrategy` and `deleteSourceBranch` every time, or they reset (`noFastForward`, not deleted).
+- `autoComplete: false` does **not** cancel auto-complete. Cancel with `az repos pr update --id <prId> --auto-complete false`.
+- Completion options are capped at **4000 encoded characters** (merge message included).
+- Armed means `autoCompleteSetBy` is not null. `completionOptions.triggeredByAutoComplete` is not a reliable signal.
+- A PR that must not merge yet cannot get a new merge message through the tool; edit it in the **Complete pull request** dialog.
+- Title/description updates on an armed PR keep the completion options.
 
 ## 4. Votes and approvals
 
