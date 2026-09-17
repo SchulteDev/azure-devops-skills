@@ -31,6 +31,10 @@ This repo currently includes skills focused on Azure DevOps work item and iterat
 - `boards-team-active-work` – Gets active work items for a team showing dependencies, priorities, and sprint assignments with parent/child hierarchy
 - `boards-work-item-summary` – Summarizes a single work item (plus links and comments)
 - `pipelines-build-summary` – Lists, inspects, and troubleshoots pipeline builds; shows recent builds, drills into status/results, displays logs for failed steps, and lists associated changes
+- `pipelines-pr-validation` – Finds a pull request's validation build and diagnoses PRs that get no build (merge ref, listing lag, conflicts, branch policies)
+- `pipelines-run-and-validate` – Queues runs on an explicit ref, passes template parameters, cancels runs, and validates YAML with `previewRun`
+- `pipelines-yaml-authoring` – Avoids silent traps when writing pipeline YAML: shells, macros, secrets, template parameters, conditions, `Cache@2`, test publishing
+- `repos-pull-requests` – Updates pull requests safely: retargeting, labels, merge commit message, auto-complete, vote history, stacked PRs, protected-branch pushes
 - `security-alert-review` – Lists and reviews Advanced Security alerts (dependency vulnerabilities, secret exposure, code scanning findings) with filtering by severity, state, and alert type
 - `work-iterations` – Lists, creates, and assigns iterations for projects and teams
 
