@@ -15,7 +15,7 @@ After every write, read the PR back with `repo_pull_request` (action `get`) and 
 
 # Rules
 
-## 1. Updates
+## 1. Updates (microsoft/azure-devops-mcp#1612)
 
 - Every `update` publishes a draft PR unless you pass `isDraft: true` — labels, auto-complete, and text changes alike.
 - An `update` with `targetRefName` applies only the retarget; title, description, and other fields are silently dropped. Retarget alone, then update the rest.
