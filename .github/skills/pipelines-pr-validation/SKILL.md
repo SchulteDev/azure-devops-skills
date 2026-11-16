@@ -18,13 +18,13 @@ Never claim a trigger is broken — in chat or on the PR — before working thro
 ## 1. PR builds run on the merge ref
 
 - PR builds have `sourceBranch` `refs/pull/<prId>/merge`, never `refs/heads/<branch>`. Filter listings with `--branch refs/pull/<prId>/merge`.
-- The merge ref is recomputed when the PR changes, not when the target moves. Compare a run's `sourceVersion` with the PR's current merge commit.
+- The merge ref is recomputed when the PR changes, not when the target moves. Compare a run's `sourceVersion` with the PR's `lastMergeCommit`.
 
 ## 2. Find the build for a push
 
 - `az repos pr policy list --id <prId>`: the Build policy's `context.buildId` shows the build immediately and whether it is required.
 - Build listings lag the queue by up to minutes.
-- Match the build's `sourceVersion` to the pushed commit.
+- The build for the push has `sourceVersion` equal to the PR's `lastMergeCommit`, and `system.pullRequest.sourceCommitId` in its `parameters` equal to `lastMergeSourceCommit`, the pushed commit.
 - `az pipelines runs list --top 1` without a branch filter can return an unrelated run.
 
 ## 3. No build at all
