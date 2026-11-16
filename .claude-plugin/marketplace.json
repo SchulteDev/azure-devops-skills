@@ -2,7 +2,7 @@
   "name": "azure-devops-skills",
   "description": "Skills for working with Azure DevOps through the Azure DevOps MCP Server",
   "owner": {
-    "name": "SchulteDev"
+    "name": "Microsoft"
   },
   "plugins": [
     {

@@ -66,7 +66,7 @@ This repository is a [Claude Code plugin marketplace](https://code.claude.com/do
 2. Install the plugin:
 
    ```bash
-   claude plugin marketplace add SchulteDev/azure-devops-skills
+   claude plugin marketplace add microsoft/azure-devops-skills
    claude plugin install azure-devops@azure-devops-skills
    ```
 
@@ -76,7 +76,7 @@ To enable it for everyone in a repository, add to its `.claude/settings.json`:
 {
   "extraKnownMarketplaces": {
     "azure-devops-skills": {
-      "source": { "source": "github", "repo": "SchulteDev/azure-devops-skills" }
+      "source": { "source": "github", "repo": "microsoft/azure-devops-skills" }
     }
   },
   "enabledPlugins": {
