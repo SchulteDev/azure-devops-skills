@@ -1,0 +1,26 @@
+{
+  "$schema": "https://antigravity.google/schemas/v1/plugin.json",
+  "name": "azure-devops",
+  "displayName": "Azure DevOps",
+  "version": "1.0.0",
+  "description": "Skills for working with Azure DevOps through the Azure DevOps MCP Server: boards, work items, iterations, pipelines, and security alerts.",
+  "skills": ["./.github/skills"],
+  "suggestedPrompts": [
+    "Show my active Azure DevOps work items",
+    "Summarize recent pipeline builds and inspect any failures",
+    "List iterations for my Azure DevOps project"
+  ],
+  "author": {
+    "name": "Microsoft",
+    "url": "https://github.com/microsoft"
+  },
+  "repository": "https://github.com/microsoft/azure-devops-skills",
+  "license": "MIT",
+  "keywords": [
+    "azure-devops",
+    "boards",
+    "pipelines",
+    "security",
+    "work-items"
+  ]
+}
