@@ -17,6 +17,7 @@ Skills in this repo are designed to:
 - `.github/` – GitHub configuration and skill metadata
 - `.vscode/` – VS Code workspace and MCP configuration
 - `.claude-plugin/` – Claude Code plugin marketplace manifest
+- `.antigravity-plugin/` – Antigravity plugin manifest
 
 ---
 
@@ -84,6 +85,21 @@ To enable it for everyone in a repository, add to its `.claude/settings.json`:
   }
 }
 ```
+
+---
+
+## 🚀 Using These Skills in Antigravity
+
+This repository is an [Antigravity plugin](https://antigravity.google/docs/plugins); its `.antigravity-plugin/plugin.json` manifest loads every skill under `.github/skills/` for both the Antigravity App and the Antigravity CLI (`agy`).
+
+1. Configure the Azure DevOps MCP server (see above), for example with `agy mcp add` or in `~/.gemini/config/mcp_config.json`.
+2. Install the plugin:
+
+   ```bash
+   agy plugin install https://github.com/microsoft/azure-devops-skills
+   ```
+
+Once installed, the skills load automatically on relevant prompts and are also available as `/<skill-name>` slash commands (for example, `/boards-my-work` or `/pipelines-build-summary`).
 
 ---
 
